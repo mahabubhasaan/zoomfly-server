@@ -7,8 +7,11 @@ const {
   GraphQLList,
   GraphQLInt,
 } = require("graphql");
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
+const cors = require("cors");
+app.use(cors());
 
 // Sample data
 const hotels = [
@@ -17,6 +20,8 @@ const hotels = [
     name: "Superior Room",
     location: "City A",
     rooms: [101, 102],
+    opportunity:
+      'price:"max. guests:2 adults bed type: 2 double or 1 king size: 28 m²Free Wi-Fi TV with mirror casting Work desk Coffee and tea facilities Minibar or fridge In-room safe Iron and ironing board Professional hair dryer Magnifying mirror Individual room climate control Rain shower',
     title: "Premium Room with Balcony or Terrace",
     info: "These Superior Rooms come with one king or two double beds, elegant linens, and comfortable armchairs. In the mornings, brew yourself a cup of coffee with the coffeemaker as you get ready for the day. If you need to, set up your laptop at the work desk, and check email using free Wi-Fi. At the end of the day, you can relax with the soothing rain shower in the spacious bathroom, and then stream your favorite show on the TV with mirror casting before heading to bed. Other amenities include a wardrobe, double-glazed windows, and an in-room safe to secure your valuables.",
   },
@@ -49,7 +54,13 @@ const hotels = [
 ];
 
 const roomsData = [
-  { id: 101, type: "Single", price: 100 },
+  {
+    id: 101,
+    type: "Single",
+    price: 100,
+    opportunity:
+      "Deal of the day Breakfast included Free cancellation before August 06, 2023, 6pm Pay on arrival Pay with Points",
+  },
   { id: 102, type: "Double", price: 150 },
   { id: 201, type: "Single", price: 120 },
   { id: 202, type: "Double", price: 180 },
@@ -64,6 +75,9 @@ const RoomType = new GraphQLObjectType({
     type: { type: GraphQLString },
     price: { type: GraphQLInt },
     title: { type: GraphQLString },
+    opportunity: { type: GraphQLString },
+    images: { type: GraphQLList(GraphQLString) }, // Add this field for multiple images
+
     info: { type: GraphQLString },
   },
 });
@@ -76,6 +90,9 @@ const HotelType = new GraphQLObjectType({
     location: { type: GraphQLString },
     title: { type: GraphQLString },
     info: { type: GraphQLString },
+    opportunity: { type: GraphQLString },
+    images: { type: GraphQLList(GraphQLString) }, // Add this field for multiple images
+
     rooms: {
       type: new GraphQLList(RoomType),
       resolve(parent, args) {
