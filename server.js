@@ -12,12 +12,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const cors = require("cors");
 app.use(cors());
-
 // Sample data
 const hotels = [
   {
     id: 1,
     name: "Superior Room",
+    img: "https://mdbcdn.b-cdn.net/img/new/standard/city/029.webp",
     location: "City A",
     rooms: [101, 102],
     opportunity:
@@ -27,7 +27,8 @@ const hotels = [
   },
   {
     id: 2,
-    name: "Deluxe Room    ",
+    name: "Deluxe Room",
+    img: "https://mdbcdn.b-cdn.net/img/new/standard/city/035.webp",
     location: "City A",
     rooms: [101, 102],
     title: "Premium Room with Balcony or Terrace",
@@ -36,6 +37,7 @@ const hotels = [
   {
     id: 3,
     name: "Business Class Room",
+    img: "https://mdbcdn.b-cdn.net/img/new/standard/city/038.webp",
     location: "City A",
     rooms: [101, 102],
     title: "Premium Room with Balcony or Terrace",
@@ -44,6 +46,7 @@ const hotels = [
   {
     id: 4,
     name: "Suite",
+    img: "https://mdbcdn.b-cdn.net/img/new/standard/city/039.webp",
     location: "City A",
     rooms: [101, 102],
     title: "Premium Room with Balcony or Terrace",
@@ -86,6 +89,7 @@ const HotelType = new GraphQLObjectType({
   name: "Hotel",
   fields: {
     id: { type: GraphQLInt },
+    img: { type: GraphQLString },
     name: { type: GraphQLString },
     location: { type: GraphQLString },
     title: { type: GraphQLString },
