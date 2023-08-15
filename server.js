@@ -7,7 +7,7 @@ const {
   GraphQLList,
   GraphQLInt,
 } = require("graphql");
-
+const mongoose = require("mongoose");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const cors = require("cors");
@@ -118,8 +118,111 @@ const RootQuery = new GraphQLObjectType({
   },
 });
 
+mongoose.connect("mongodb://localhost:27017/zoomfly", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+db.once("open", () => {
+  console.log("Connected to MongoDB");
+});
+
+const Mutation = new GraphQLObjectType({
+  name: "Mutation",
+  fields: {
+    createHotel: {
+      type: HotelType,
+      args: {
+        id: { type: GraphQLInt },
+        img: { type: GraphQLString },
+        name: { type: GraphQLString },
+        location: { type: GraphQLString },
+        title: { type: GraphQLString },
+        info: { type: GraphQLString },
+        opportunity: { type: GraphQLString },
+        images: { type: GraphQLList(GraphQLString) },
+      },
+      async resolve(parent, args) {
+        const newHotel = new HotelModel({
+          name: args.name,
+          img: args.img,
+          name: args.name,
+          location: args.location,
+          title: args.title,
+          info: args.info,
+          opportunity: args.opportunity,
+          // ... initialize other fields
+        });
+
+        try {
+          const savedHotel = await newHotel.save();
+          return savedHotel;
+        } catch (error) {
+          throw new Error("Error creating hotel");
+        }
+      },
+    },
+
+    updateHotel: {
+      type: HotelType,
+      args: {
+        id: { type: GraphQLInt },
+        img: { type: GraphQLString },
+        name: { type: GraphQLString },
+        location: { type: GraphQLString },
+        title: { type: GraphQLString },
+        info: { type: GraphQLString },
+        opportunity: { type: GraphQLString },
+        images: { type: GraphQLList(GraphQLString) },
+        // ... add more fields as needed
+      },
+      async resolve(parent, args) {
+        try {
+          const updatedHotel = await HotelModel.findByIdAndUpdate(
+            args.id,
+            {
+              $set: {
+                id: { type: GraphQLInt },
+                img: { type: GraphQLString },
+                name: { type: GraphQLString },
+                location: { type: GraphQLString },
+                title: { type: GraphQLString },
+                info: { type: GraphQLString },
+                opportunity: { type: GraphQLString },
+                images: { type: GraphQLList(GraphQLString) },
+                // ... update other fields
+              },
+            },
+            { new: true }
+          );
+          return updatedHotel;
+        } catch (error) {
+          throw new Error("Error updating hotel");
+        }
+      },
+    },
+
+    deleteHotel: {
+      type: GraphQLString,
+      args: {
+        id: { type: GraphQLString },
+      },
+      async resolve(parent, args) {
+        try {
+          await HotelModel.findByIdAndDelete(args.id);
+          return "Hotel deleted";
+        } catch (error) {
+          throw new Error("Error deleting hotel");
+        }
+      },
+    },
+  },
+});
+
 const schema = new GraphQLSchema({
   query: RootQuery,
+  mutation: Mutation,
 });
 
 app.use(
